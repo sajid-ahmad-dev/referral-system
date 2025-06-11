@@ -35,11 +35,14 @@ const userSignUp = async (req, res) => {
     });
     await user.save();
 
+    let referralStatus = "No referral code provided";
     if (referralCode) {
       try {
         await ReferralService.processReferral(referralCode, user._id);
+        referralStatus = "Successfully linked with referrer";
       } catch (error) {
-        console.error("Referral processing error:", error);
+        console.error("Referral processing error:", error.message);
+        referralStatus = "Invalid referral code provided";
       }
     }
 
@@ -53,9 +56,7 @@ const userSignUp = async (req, res) => {
         referralCode: user.referralCode,
       },
       token: token,
-      message: referralCode
-        ? "User registered successfully. Note: Invalid referral code was provided."
-        : "User registered successfully.",
+      message: `User registered successfully. ${referralStatus}`,
     });
   } catch (error) {
     return res

@@ -7,7 +7,7 @@ class ReferralService {
     try {
       const referrer = await User.findOne({ referralCode });
       if (!referrer) {
-        throw new Error("Invalid referral code");
+        throw new Error("Invalid referral code provided");
       }
 
       const newUser = await User.findById(newUserId);
@@ -19,13 +19,18 @@ class ReferralService {
         throw new Error("Referrer has reached maximum direct referrals limit");
       }
 
+      // Check if user is trying to use their own referral code
+      if (referrer._id.toString() === newUserId.toString()) {
+        throw new Error("Cannot use your own referral code");
+      }
+
       newUser.referredBy = referrer._id;
       referrer.directReferrals.push(newUser._id);
 
       await Promise.all([newUser.save(), referrer.save()]);
       return { referrer, newUser };
     } catch (error) {
-      throw error;
+      throw new Error(`Referral processing failed: ${error.message}`);
     }
   }
 
