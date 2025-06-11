@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 
-const UserSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
@@ -24,6 +23,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       unique: true,
       required: true,
+      default: function () {
+        return Math.random().toString(36).substring(2, 8).toUpperCase();
+      },
     },
     referredBy: {
       type: mongoose.Schema.Types.ObjectId,
@@ -52,42 +54,14 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-UserSchema.pre("save", async function (next) {
-  try {
-    // Password hashing
-
-    if (this.isModified("password")) {
-      this.password = await bcrypt.hash(this.password, 10);
-    }
-
-    // Limit direct referrals
-
-    if (this.directReferrals && this.directReferrals.length > 8) {
-      return next(new Error("Maximum direct referrals limit exceeded"));
-    }
-
-    // Generate unique referral code
-
-    if (!this.referralCode) {
-      let isUnique = false;
-      while (!isUnique) {
-        const newCode = Math.random().toString(36).slice(2, 8).toUpperCase();
-        const existingUser = await mongoose.models.User.findOne({
-          referralCode: newCode,
-        });
-        if (!existingUser) {
-          this.referralCode = newCode;
-          isUnique = true;
-        }
-      }
-    }
-
-    next();
-  } catch (error) {
-    next(error);
+// Ensure direct referrals don't exceed 8
+userSchema.pre("save", function (next) {
+  if (this.directReferrals.length > 8) {
+    next(new Error("Maximum direct referrals limit exceeded"));
   }
+  next();
 });
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;
