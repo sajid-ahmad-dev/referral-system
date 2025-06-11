@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
@@ -55,13 +55,13 @@ const userSchema = new mongoose.Schema(
 );
 
 // Ensure direct referrals don't exceed 8
-userSchema.pre("save", function (next) {
+UserSchema.pre("save", function (next) {
   if (this.directReferrals.length > 8) {
     next(new Error("Maximum direct referrals limit exceeded"));
   }
   next();
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", UserSchema);
 
 module.exports = User;
