@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WebSocket Test</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      #messages {
+        height: 300px;
+        border: 1px solid #ccc;
+        margin: 20px 0;
+        padding: 10px;
+        overflow-y: auto;
+      }
+      .message {
+        margin: 5px 0;
+        padding: 5px;
+        border-radius: 4px;
+      }
+      .purchase {
+        background-color: #e3f2fd;
+      }
+      .connection {
+        background-color: #f5f5f5;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebSocket Test</h1>
+    <div>
+      <label for="userId">User ID:</label>
+      <input type="text" id="userId" placeholder="Enter your user ID" />
+      <button onclick="joinRoom()">Join Room</button>
+    </div>
+    <div id="messages"></div>
+
+    <script>
+      const socket = io("http://localhost:4000");
+      const messagesDiv = document.getElementById("messages");
+
+      // Connection events
+      socket.on("connect", () => {
+        addMessage("Connected to server", "connection");
+      });
+
+      socket.on("disconnect", () => {
+        addMessage("Disconnected from server", "connection");
+      });
+
+      // Purchase events
+      socket.on("newPurchase", (data) => {
+        addMessage(
+          `New purchase: Amount: ${data.amount}, Profit: ${data.profit}`,
+          "purchase"
+        );
+      });
+
+      function joinRoom() {
+        const userId = document.getElementById("userId").value;
+        if (userId) {
+          socket.emit("joinUserRoom", userId);
+          addMessage(`Joined room for user: ${userId}`, "connection");
+        }
+      }
+
+      function addMessage(message, type) {
+        const messageElement = document.createElement("div");
+        messageElement.className = `message ${type}`;
+        messageElement.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+    </script>
+  </body>
+</html>

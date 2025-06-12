@@ -91,17 +91,15 @@ const userLogin = async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET);
-    return res.status(StatusCodes.OK).json(
-      {
-        user: {
-          id: user._id,
-          username: user.username,
-          email: user.email,
-          referralCode: user.referralCode,
-        },
+    return res.status(StatusCodes.OK).json({
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        referralCode: user.referralCode,
       },
-      { token: token }
-    );
+      token: token,
+    });
   } catch (error) {
     return res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)
