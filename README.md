@@ -18,7 +18,7 @@ A real-time referral and earning system that enables users to refer others and e
 
 - Node.js (v14 or higher)
 - MongoDB
-- npm or yarn
+- npm
 
 ## Installation
 
@@ -77,8 +77,6 @@ http://localhost:4000/test-socket.html
 - Earnings updates
 - Referral activities
 
-## Database Schema
-
 ### User
 
 - username
@@ -108,21 +106,3 @@ http://localhost:4000/test-socket.html
 - Input validation using express-validator
 - CORS enabled
 - Environment variable configuration
-
-## Error Handling
-
-The system includes comprehensive error handling for:
-
-- Invalid inputs
-- Authentication failures
-- Database errors
-- Referral limit exceeded
-- Minimum purchase amount validation
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a new Pull Request
